@@ -464,7 +464,12 @@ namespace DotProbe
                 try
                 {
                     Behavior.StartSequence(UsernameTextBox.Text, System.Convert.ToInt32(AgeTextBox.Text));
-                    CenterLabel.Content = "Press Enter/Spacebar to start.";
+                    CenterLabel.Content = "Press Enter/Spacebar/" + Behavior.Settings.KeyForDotPosition1 + "/" + Behavior.Settings.KeyForDotPosition2 + " to start.\n"
+                                        + "Then:\n"
+                                        + "Press the " + Behavior.Settings.KeyForDotPosition1 + " key when the dot is at the "
+                                            + (Behavior.Settings.VerticalSides ? "top.\n" : "left side.\n")
+                                        + "Press the " + Behavior.Settings.KeyForDotPosition2 + " key when the dot is at the "
+                                            + (Behavior.Settings.VerticalSides ? "bottom." : "right side.");
                     Word1.Content = "";
                     Word2.Content = "";
                     Dot1.Visibility = System.Windows.Visibility.Hidden;
@@ -609,7 +614,8 @@ namespace DotProbe
                 if (HHalf > 1) MessageLabel.FontSize = HHalf;
             };
 
-            MainWindow.KeyDown += async (object sender, System.Windows.Input.KeyEventArgs e) =>
+            // PreviewKeyDown instead of KeyDown to be able to handle arrow keys.
+            MainWindow.PreviewKeyDown += async (object sender, System.Windows.Input.KeyEventArgs e) =>
             {
                 if (Animating) return;
                 if (e.Key == System.Windows.Input.Key.F11
@@ -625,48 +631,54 @@ namespace DotProbe
                 }
 
                 if (DotProbeGrid.Visibility == System.Windows.Visibility.Visible && !DisplayingWords
-                    && (e.Key == System.Windows.Input.Key.Space
-                        || e.Key == System.Windows.Input.Key.Enter))
+                    && (CurrentItem == null ?
+                        (e.Key == System.Windows.Input.Key.Enter
+                            || e.Key == System.Windows.Input.Key.Space
+                            || e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition1.ToUpper()
+                            || e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition2.ToUpper())
+                        : ((e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition1.ToUpper()
+                                && CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position1)
+                            || (e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition2.ToUpper()
+                                && CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2))))
                 {
                     DisplayingWords = true;
                     if ((string)CenterLabel.Content == Behavior.Settings.CenterText)
                     {
-                        if (e.Key == System.Windows.Input.Key.Space || e.Key == System.Windows.Input.Key.Enter)
+                        Behavior.StopTimer();
+
+                        Dot1.Visibility = System.Windows.Visibility.Hidden;
+                        Dot2.Visibility = System.Windows.Visibility.Hidden;
+                        CenterLabel.Content = "";
+
+                        CurrentItem = Behavior.GetNext();
+                        if (CurrentItem == null)
                         {
-                            Behavior.StopTimer();
+                            ShowMessage("Test done.", 0);
+                            bool Animations = CustomControls.GlobalSettings.Animations;
+                            await Task.Delay(CustomControls.GlobalSettings.Animations ?
+                                                CustomControls.GlobalSettings.AnimationDurationInMilliseconds + 100
+                                                : 100);
+                            CustomControls.GlobalSettings.Animations = false;
+                            HideGrid(DotProbeGrid, DotProbeToken);
+                            CustomControls.GlobalSettings.Animations = Animations;
+                        }
+                        else
+                        {
+                            await Task.Delay(Behavior.Settings.WaitTime);
 
-                            Dot1.Visibility = System.Windows.Visibility.Hidden;
-                            Dot2.Visibility = System.Windows.Visibility.Hidden;
-                            CenterLabel.Content = "";
+                            CenterLabel.Content = Behavior.Settings.CenterText;
+                            Word1.Content = CurrentItem.Item1.Item2;
+                            Word2.Content = CurrentItem.Item2.Item2;
 
-                            var Item = Behavior.GetNext();
-                            if (Item == null)
-                            {
-                                ShowMessage("Test done.", 0);
-                                bool Animations = CustomControls.GlobalSettings.Animations;
-                                await Task.Delay(CustomControls.GlobalSettings.AnimationDurationInMilliseconds + 100);
-                                CustomControls.GlobalSettings.Animations = false;
-                                HideGrid(DotProbeGrid, DotProbeToken);
-                                CustomControls.GlobalSettings.Animations = true;
-                            }
-                            else
-                            {
-                                await Task.Delay(Behavior.Settings.WaitTime);
+                            await Task.Delay(Behavior.Settings.WordsDisplayTime);
 
-                                CenterLabel.Content = Behavior.Settings.CenterText;
-                                Word1.Content = Item.Item1.Item2;
-                                Word2.Content = Item.Item2.Item2;
-
-                                await Task.Delay(Behavior.Settings.WordsDisplayTime);
-
-                                Behavior.StartTimer();
-                                Word1.Content = "";
-                                Word2.Content = "";
-                                if (Item.Item3 == DotProbeBehavior.DotPosition.Position1)
-                                    Dot1.Visibility = System.Windows.Visibility.Visible;
-                                else if (Item.Item3 == DotProbeBehavior.DotPosition.Position2)
-                                    Dot2.Visibility = System.Windows.Visibility.Visible;
-                            }
+                            Behavior.StartTimer();
+                            Word1.Content = "";
+                            Word2.Content = "";
+                            if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position1)
+                                Dot1.Visibility = System.Windows.Visibility.Visible;
+                            else if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2)
+                                Dot2.Visibility = System.Windows.Visibility.Visible;
                         }
                     }
                     else // First
@@ -675,19 +687,19 @@ namespace DotProbe
 
                         await Task.Delay(Behavior.Settings.WaitTime);
 
-                        var Item = Behavior.GetNext();
+                        CurrentItem = Behavior.GetNext();
                         CenterLabel.Content = Behavior.Settings.CenterText;
-                        Word1.Content = Item.Item1.Item2;
-                        Word2.Content = Item.Item2.Item2;
+                        Word1.Content = CurrentItem.Item1.Item2;
+                        Word2.Content = CurrentItem.Item2.Item2;
 
                         await Task.Delay(Behavior.Settings.WordsDisplayTime);
 
                         Behavior.StartTimer();
                         Word1.Content = "";
                         Word2.Content = "";
-                        if (Item.Item3 == DotProbeBehavior.DotPosition.Position1)
+                        if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position1)
                             Dot1.Visibility = System.Windows.Visibility.Visible;
-                        else if (Item.Item3 == DotProbeBehavior.DotPosition.Position2)
+                        else if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2)
                             Dot2.Visibility = System.Windows.Visibility.Visible;
                     }
                     DisplayingWords = false;
@@ -720,11 +732,11 @@ namespace DotProbe
 
         public DotProbeBehavior Behavior { get; } = new DotProbeBehavior();
 
-        enum DotProbeGUIState : byte { Lobby = 0, Starting = 1, DotProbe = 2, DotProbePlaying = 3 };
-
         bool Animating = false;
         bool Exiting = false;
         bool DisplayingWords = false;
+
+        Tuple<Tuple<bool, string>, Tuple<bool, string>, DotProbeBehavior.DotPosition> CurrentItem = null;
 
         CustomControls.Ptr<int> StartToken = new CustomControls.Ptr<int>(0);
         //CustomControls.Ptr<int> SettingsToken = new CustomControls.Ptr<int>(0);
@@ -1051,6 +1063,9 @@ namespace DotProbe
 
         public string CenterText;
 
+        public string KeyForDotPosition1;
+        public string KeyForDotPosition2;
+
         public Settings()
         {
             Reset();
@@ -1077,6 +1092,9 @@ namespace DotProbe
             DotSize = 8;
 
             CenterText = "+";
+
+            KeyForDotPosition1 = "Up";
+            KeyForDotPosition2 = "Down";
         }
 
         public void Load()
@@ -1133,6 +1151,12 @@ namespace DotProbe
                                 case "CenterText":
                                     CenterText = element.Value;
                                     break;
+                                case "KeyForDotPosition1":
+                                    KeyForDotPosition1 = element.Value;
+                                    break;
+                                case "KeyForDotPosition2":
+                                    KeyForDotPosition2 = element.Value;
+                                    break;
                                 default:
                                     break;
                             }
@@ -1159,7 +1183,9 @@ namespace DotProbe
                 new XElement("DotSize", DotSize),
                 new XElement("WaitTime", WaitTime),
                 new XElement("WordsDisplayTime", WordsDisplayTime),
-                new XElement("CenterText", CenterText)
+                new XElement("CenterText", CenterText),
+                new XElement("KeyForDotPosition1", KeyForDotPosition1),
+                new XElement("KeyForDotPosition2", KeyForDotPosition2)
                 );
             xml_settings.Save(SettingsFilename);
         }
