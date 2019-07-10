@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -67,7 +67,7 @@ namespace DotProbe
             TextBox SequenceFilenameTextBox = new TextBox
             {
                 Text = "sequence.xml",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Background = CustomControls.GlobalSettings.BG,
                 Foreground = CustomControls.GlobalSettings.FG
@@ -93,43 +93,43 @@ namespace DotProbe
                     e.CancelCommand();
             });
 
-            TextBox SequenceCountTextBox = new TextBox
+            TextBox SequenceLengthTextBox = new TextBox
             {
                 Text = "20",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Background = CustomControls.GlobalSettings.BG,
                 Foreground = CustomControls.GlobalSettings.FG
             };
-            StartGrid.Children.Add(SequenceCountTextBox);
+            StartGrid.Children.Add(SequenceLengthTextBox);
 
-            AllowNumbersOnly(SequenceCountTextBox);
+            AllowNumbersOnly(SequenceLengthTextBox);
 
             Label SequenceFilenameLabel = new Label()
             {
                 Content = "Sequence Filename",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Foreground = CustomControls.GlobalSettings.FG,
                 Padding = new System.Windows.Thickness(0)
             };
             StartGrid.Children.Add(SequenceFilenameLabel);
 
-            Label SequenceCountLabel = new Label()
+            Label SequenceLengthLabel = new Label()
             {
-                Content = "Seq Count",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                Content = "Seq Items Count",
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Foreground = CustomControls.GlobalSettings.FG,
                 Padding = new System.Windows.Thickness(0)
             };
-            StartGrid.Children.Add(SequenceCountLabel);
+            StartGrid.Children.Add(SequenceLengthLabel);
 
             CustomControls.Button LoadSequenceButton = new CustomControls.Button
             {
                 Text = "Load Sequence"
             };
-            LoadSequenceButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            LoadSequenceButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             LoadSequenceButton.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(LoadSequenceButton.MainGrid);
 
@@ -137,12 +137,12 @@ namespace DotProbe
             {
                 Text = "Generate Sequence"
             };
-            GenerateSequenceButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            GenerateSequenceButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             GenerateSequenceButton.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(GenerateSequenceButton.MainGrid);
 
             CustomControls.Toggle DarkModeToggle = new CustomControls.Toggle("DarkMode", Behavior.Settings.DarkMode);
-            DarkModeToggle.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            DarkModeToggle.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             DarkModeToggle.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(DarkModeToggle.MainGrid);
 
@@ -154,7 +154,7 @@ namespace DotProbe
             };
 
             CustomControls.Toggle FullscreenToggle = new CustomControls.Toggle("Fullscreen", Behavior.Settings.Fullscreen);
-            FullscreenToggle.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            FullscreenToggle.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             FullscreenToggle.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(FullscreenToggle.MainGrid);
 
@@ -168,7 +168,7 @@ namespace DotProbe
             Label UsernameLabel = new Label()
             {
                 Content = "Name",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Foreground = CustomControls.GlobalSettings.FG,
                 Padding = new System.Windows.Thickness(0)
@@ -178,7 +178,7 @@ namespace DotProbe
             TextBox UsernameTextBox = new TextBox
             {
                 Text = "N/A",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Background = CustomControls.GlobalSettings.BG,
                 Foreground = CustomControls.GlobalSettings.FG
@@ -188,7 +188,7 @@ namespace DotProbe
             Label AgeLabel = new Label()
             {
                 Content = "Age",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Foreground = CustomControls.GlobalSettings.FG,
                 Padding = new System.Windows.Thickness(0)
@@ -198,7 +198,7 @@ namespace DotProbe
             TextBox AgeTextBox = new TextBox
             {
                 Text = "20",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center,
                 Background = CustomControls.GlobalSettings.BG,
                 Foreground = CustomControls.GlobalSettings.FG
@@ -211,7 +211,7 @@ namespace DotProbe
             {
                 Text = "Start as " + UsernameTextBox.Text
             };
-            StartButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            StartButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             StartButton.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(StartButton.MainGrid);
 
@@ -227,7 +227,7 @@ namespace DotProbe
             {
                 Text = "Save Records"
             };
-            SaveRecordsButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            SaveRecordsButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             SaveRecordsButton.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(SaveRecordsButton.MainGrid);
 
@@ -235,7 +235,7 @@ namespace DotProbe
             {
                 Text = "About"
             };
-            AboutButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            AboutButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             AboutButton.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(AboutButton.MainGrid);
 
@@ -243,7 +243,7 @@ namespace DotProbe
             {
                 Text = "Exit"
             };
-            ExitButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            ExitButton.MainGrid.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             ExitButton.MainGrid.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             StartGrid.Children.Add(ExitButton.MainGrid);
 
@@ -448,9 +448,9 @@ namespace DotProbe
                 if (Animating) return;
                 try
                 {
-                    if (SequenceCountTextBox.Text == "")
+                    if (SequenceLengthTextBox.Text == "")
                         throw new DotProbeBehavior.MessageException("Enter the sequence count!");
-                    Behavior.GenerateSequence(SequenceFilenameTextBox.Text, System.Convert.ToInt32(SequenceCountTextBox.Text));
+                    Behavior.GenerateSequence(SequenceFilenameTextBox.Text, System.Convert.ToInt32(SequenceLengthTextBox.Text));
                 }
                 catch (DotProbeBehavior.MessageException e)
                 {
@@ -517,6 +517,7 @@ namespace DotProbe
                 }
             };
 
+            // Layout --------------------------------
             MainGrid.SizeChanged += (object sender, System.Windows.SizeChangedEventArgs e) =>
             {
                 SquareGrid.Width = SquareGrid.Height = System.Math.Min(MainGrid.ActualWidth, MainGrid.ActualHeight);
@@ -525,89 +526,77 @@ namespace DotProbe
                 double Quarter = SquareGrid.Height / 4;
                 double Eighth = SquareGrid.Height / 8;
                 double HalfAndQuarter = SquareGrid.Height * 0.75;
-                double W = SquareGrid.Width * 0.8;
+                double Gap = SquareGrid.Width / 32;
+                double HalfGap = SquareGrid.Width / 64;
+                double HalfG = Half + HalfGap;
+                double QuarterG = Quarter + HalfGap;
+                double HalfAndQuarterG = HalfAndQuarter + HalfGap;
                 double H = SquareGrid.Height / 12;
                 double HHalf = SquareGrid.Height / 24;
 
                 // Start: Sequence options
 
-                SequenceFilenameLabel.Margin = new System.Windows.Thickness(0, 0, Quarter, HalfAndQuarter + Eighth);
+                SequenceFilenameLabel.Margin = new System.Windows.Thickness(Gap, 0, HalfG, HalfAndQuarter + Eighth);
                 SequenceFilenameLabel.Height = H;
                 if (HHalf > 1) SequenceFilenameLabel.FontSize = HHalf;
-                SequenceFilenameLabel.Width = W * 0.75;
 
-                SequenceCountLabel.Margin = new System.Windows.Thickness(HalfAndQuarter, 0, 0, HalfAndQuarter + Eighth);
-                SequenceCountLabel.Height = H;
-                if (HHalf > 1) SequenceCountLabel.FontSize = HHalf;
-                SequenceCountLabel.Width = W / 4;
+                SequenceLengthLabel.Margin = new System.Windows.Thickness(HalfG, 0, Gap, HalfAndQuarter + Eighth);
+                SequenceLengthLabel.Height = H;
+                if (HHalf > 1) SequenceLengthLabel.FontSize = HHalf;
 
-                SequenceFilenameTextBox.Margin = new System.Windows.Thickness(0, Eighth, Quarter, HalfAndQuarter);
+                SequenceFilenameTextBox.Margin = new System.Windows.Thickness(Gap, Eighth, HalfG, HalfAndQuarter);
                 SequenceFilenameTextBox.Height = H;
                 if (HHalf > 1) SequenceFilenameTextBox.FontSize = HHalf;
-                SequenceFilenameTextBox.Width = W * 0.75;
 
-                SequenceCountTextBox.Margin = new System.Windows.Thickness(HalfAndQuarter, Eighth, 0, HalfAndQuarter);
-                SequenceCountTextBox.Height = H;
-                if (HHalf > 1) SequenceCountTextBox.FontSize = HHalf;
-                SequenceCountTextBox.Width = W / 4;
+                SequenceLengthTextBox.Margin = new System.Windows.Thickness(HalfG, Eighth, Gap, HalfAndQuarter);
+                SequenceLengthTextBox.Height = H;
+                if (HHalf > 1) SequenceLengthTextBox.FontSize = HHalf;
 
-                GenerateSequenceButton.MainGrid.Margin = new System.Windows.Thickness(Half, Quarter, 0, Half + Eighth);
+                GenerateSequenceButton.MainGrid.Margin = new System.Windows.Thickness(HalfG, Quarter, Gap, Half + Eighth);
                 GenerateSequenceButton.MainGrid.Height = H;
-                GenerateSequenceButton.MainGrid.Width = W / 2;
 
-                LoadSequenceButton.MainGrid.Margin = new System.Windows.Thickness(0, Quarter, Half, Half + Eighth);
+                LoadSequenceButton.MainGrid.Margin = new System.Windows.Thickness(Gap, Quarter, HalfG, Half + Eighth);
                 LoadSequenceButton.MainGrid.Height = H;
-                LoadSequenceButton.MainGrid.Width = W / 2;
 
                 // Start: Toggles
 
-                DarkModeToggle.MainGrid.Margin = new System.Windows.Thickness(Half, Quarter + Eighth, 0, Half);
+                DarkModeToggle.MainGrid.Margin = new System.Windows.Thickness(HalfG, Quarter + Eighth, Gap, Half);
                 DarkModeToggle.MainGrid.Height = H;
-                DarkModeToggle.MainGrid.Width = W / 2;
 
-                FullscreenToggle.MainGrid.Margin = new System.Windows.Thickness(0, Quarter + Eighth, Half, Half);
+                FullscreenToggle.MainGrid.Margin = new System.Windows.Thickness(Gap, Quarter + Eighth, HalfG, Half);
                 FullscreenToggle.MainGrid.Height = H;
-                FullscreenToggle.MainGrid.Width = W / 2;
 
                 // Start: Name and Age
 
-                UsernameTextBox.Margin = new System.Windows.Thickness(0, Half + Eighth, Quarter, Quarter);
+                UsernameTextBox.Margin = new System.Windows.Thickness(Gap, Half + Eighth, QuarterG, Quarter);
                 UsernameTextBox.Height = H;
                 if (HHalf > 1) UsernameTextBox.FontSize = HHalf;
-                UsernameTextBox.Width = W * 0.75;
 
-                AgeTextBox.Margin = new System.Windows.Thickness(HalfAndQuarter, Half + Eighth, 0, Quarter);
+                AgeTextBox.Margin = new System.Windows.Thickness(HalfAndQuarterG, Half + Eighth, Gap, Quarter);
                 AgeTextBox.Height = H;
                 if (HHalf > 1) AgeTextBox.FontSize = HHalf;
-                AgeTextBox.Width = W / 4;
 
-                UsernameLabel.Margin = new System.Windows.Thickness(0, Half, Quarter, Quarter + Eighth);
+                UsernameLabel.Margin = new System.Windows.Thickness(Gap, Half, QuarterG, Quarter + Eighth);
                 UsernameLabel.Height = H;
                 if (HHalf > 1) UsernameLabel.FontSize = HHalf;
-                UsernameLabel.Width = W * 0.75;
 
-                AgeLabel.Margin = new System.Windows.Thickness(HalfAndQuarter, Half, 0, Quarter + Eighth);
+                AgeLabel.Margin = new System.Windows.Thickness(HalfAndQuarterG, Half, Gap, Quarter + Eighth);
                 AgeLabel.Height = H;
                 if (HHalf > 1) AgeLabel.FontSize = HHalf;
-                AgeLabel.Width = W / 4;
 
                 // Start: Bottom buttons
 
-                StartButton.MainGrid.Margin = new System.Windows.Thickness(0, HalfAndQuarter, Half, Eighth);
+                StartButton.MainGrid.Margin = new System.Windows.Thickness(Gap, HalfAndQuarter, HalfG, Eighth);
                 StartButton.MainGrid.Height = H;
-                StartButton.MainGrid.Width = W / 2;
 
-                SaveRecordsButton.MainGrid.Margin = new System.Windows.Thickness(Half, HalfAndQuarter, 0, Eighth);
+                SaveRecordsButton.MainGrid.Margin = new System.Windows.Thickness(HalfG, HalfAndQuarter, Gap, Eighth);
                 SaveRecordsButton.MainGrid.Height = H;
-                SaveRecordsButton.MainGrid.Width = W / 2;
 
-                AboutButton.MainGrid.Margin = new System.Windows.Thickness(0, HalfAndQuarter + Eighth, Half, 0);
+                AboutButton.MainGrid.Margin = new System.Windows.Thickness(Gap, HalfAndQuarter + Eighth, HalfG, 0);
                 AboutButton.MainGrid.Height = H;
-                AboutButton.MainGrid.Width = W / 2;
 
-                ExitButton.MainGrid.Margin = new System.Windows.Thickness(Half, HalfAndQuarter + Eighth, 0, 0);
+                ExitButton.MainGrid.Margin = new System.Windows.Thickness(HalfG, HalfAndQuarter + Eighth, Gap, 0);
                 ExitButton.MainGrid.Height = H;
-                ExitButton.MainGrid.Width = W / 2;
 
                 // Message
 
@@ -755,10 +744,8 @@ namespace DotProbe
 
         public Settings Settings { get; } = new Settings();
 
-        public void GenerateSequence(string SequenceFilename, int SequenceCount)
+        public void GenerateSequence(string SequenceFilename, int SequenceLength)
         {
-            List<Tuple<Tuple<bool, string>, Tuple<bool, string>>> seq;
-
             // Check list files' validity
             if (!System.IO.File.Exists(Settings.NeutralWordsListFilename))
                 throw new MessageException("No neutral words list file exists in:\n" + Settings.NeutralWordsListFilename);
@@ -768,35 +755,112 @@ namespace DotProbe
             // Load
             string[] NeutralWords = System.IO.File.ReadAllLines(Settings.NeutralWordsListFilename);
             string[] ThreateningWords = System.IO.File.ReadAllLines(Settings.ThreateningWordsListFilename);
+            int NeutralWordsLength = NeutralWords.Length;
+            int ThreateningWordsLength = ThreateningWords.Length;
+
+            if (NeutralWordsLength == 0)
+                throw new MessageException("Neutral words list is empty! Please edit:\n" + Settings.NeutralWordsListFilename);
+            if (ThreateningWordsLength == 0)
+                throw new MessageException("Threatening words list is empty! Please edit:\n" + Settings.NeutralWordsListFilename);
+
+            if (!Settings.AllowWordRepeat)
+            {
+                int Max = Math.Min(ThreateningWordsLength, NeutralWordsLength / 2);
+                if (SequenceLength > Max)
+                {
+                    int SoftMax = Math.Min(
+                        (int)(ThreateningWordsLength * (100.0 / Settings.ThreateningWordsProbability)),
+                        (int)(NeutralWordsLength * (100.0 / (
+                                Settings.ThreateningWordsProbability // 1 neutral word for each
+                                + 2 * (100 - Settings.ThreateningWordsProbability) // 2 neutral words for each
+                             )))
+                    );
+                    if (SequenceLength > SoftMax)
+                            throw new MessageException("The maximum seq items count for the current set of words is:\n"
+                                                        + SoftMax.ToString());
+                }
+            }
 
             // Save unsaved records
             bool UnsavedRecords = Records.Count > 0;
             if (UnsavedRecords)
                 SaveRecords();
 
+            bool InsufficientWords = false;
+
             // Generate
             Sequence.Clear();
             Random Rand = new Random();
-            for (int i = 0; i < SequenceCount; i++)
+            for (int i = 0; i < SequenceLength; i++)
             {
                 bool HasThreatening = Rand.NextDouble() < Settings.ThreateningWordsProbability / 100;
                 bool IsWord1Threatening = Rand.NextDouble() < 0.5;
+                if (!Settings.AllowWordRepeat)
+                {
+                    bool InsufficientThreatening = ThreateningWordsLength < 1;
+                    bool InsufficientNeutral = NeutralWordsLength <= SequenceLength - Sequence.Count;
+                    if (NeutralWordsLength < 2 && InsufficientThreatening) // Unlikely or impossible
+                    {
+                        InsufficientWords = true;
+                        break;
+                    }
+                    else if (InsufficientThreatening) HasThreatening = false; // Normal if !InsufficientNeutral
+                    else if (InsufficientNeutral) HasThreatening = true; // Normal
+                }
 
-                string Word1 = HasThreatening && IsWord1Threatening ?
-                                ThreateningWords[Rand.Next(0, ThreateningWords.Length)]
-                                : NeutralWords[Rand.Next(0, NeutralWords.Length)];
+                int Word1Index = IsWord1Threatening && HasThreatening ?
+                                Rand.Next(0, ThreateningWordsLength)
+                                : Rand.Next(0, NeutralWordsLength);
 
-                string Word2 = HasThreatening && !IsWord1Threatening ?
-                                ThreateningWords[Rand.Next(0, ThreateningWords.Length)]
-                                : NeutralWords[Rand.Next(0, NeutralWords.Length)];
+                string Word1 = IsWord1Threatening && HasThreatening ?
+                                ThreateningWords[Word1Index]
+                                : NeutralWords[Word1Index];
+
+                int Word2Index = !IsWord1Threatening && HasThreatening ?
+                                Rand.Next(0, ThreateningWordsLength)
+                                : Rand.Next(0, NeutralWordsLength);
+
+                string Word2 = !IsWord1Threatening && HasThreatening ?
+                                ThreateningWords[Word2Index]
+                                : NeutralWords[Word2Index];
+
+                if (!Settings.AllowWordRepeat)
+                {
+                    Action<int, int> SwapN = (int Index1, int Index2) =>
+                    {
+                        string temp = NeutralWords[Index1];
+                        NeutralWords[Index1] = NeutralWords[Index2];
+                        NeutralWords[Index2] = temp;
+                    };
+                    Action<int, int> SwapT = (int Index1, int Index2) =>
+                    {
+                        string temp = ThreateningWords[Index1];
+                        ThreateningWords[Index1] = ThreateningWords[Index2];
+                        ThreateningWords[Index2] = temp;
+                    };
+
+                    // For each related array, swap the chosen word with the last accepted word, and reduce their accepted lengths.
+                    if (IsWord1Threatening && HasThreatening)  { SwapT(Word1Index, ThreateningWordsLength - 1); ThreateningWordsLength--; }
+                    else                                       { SwapN(Word1Index, NeutralWordsLength     - 1); NeutralWordsLength--; }
+                    if (!IsWord1Threatening && HasThreatening) { SwapT(Word2Index, ThreateningWordsLength - 1); ThreateningWordsLength--; }
+                    else                                       { SwapN(Word2Index, NeutralWordsLength     - 1); NeutralWordsLength--; }
+
+                    // And reduce their accepted lengths.
+                    //if (HasThreatening) { ThreateningWordsLength--; NeutralWordsLength--; }
+                    //else { NeutralWordsLength -= 2; }
+                    foreach (var item in NeutralWords) { Console.Write(item[item.Length - 1]); }
+                    Console.WriteLine();
+                    foreach (var item in ThreateningWords) { Console.Write(item[item.Length - 1]); }
+                    Console.WriteLine();
+                }
 
                 DotPosition Dot = (Rand.NextDouble() < Settings.OpositeSideDotProbability / 100) ?
                                     (IsWord1Threatening ? DotPosition.Position2 : DotPosition.Position1)
                                     : (IsWord1Threatening ? DotPosition.Position1 : DotPosition.Position2);
 
                 Sequence.Add(new Tuple<Tuple<bool, string>, Tuple<bool, string>, DotPosition>(
-                        new Tuple<bool, string>(IsWord1Threatening, Word1),
-                        new Tuple<bool, string>(!IsWord1Threatening, Word2),
+                        new Tuple<bool, string>(IsWord1Threatening && HasThreatening, Word1),
+                        new Tuple<bool, string>(!IsWord1Threatening && HasThreatening, Word2),
                         Dot
                     ));
             }
@@ -816,9 +880,11 @@ namespace DotProbe
             }
             SequenceXML.Save(SequenceFilename);
 
+            string SideNotes = InsufficientWords ? "\nInsufficient word lists, generated seq length=" + Sequence.Count : "";
+
             if (UnsavedRecords)
-                throw new MessageException("Saved the records before generating the new sequence.");
-            throw new MessageException("Sequence generated!");
+                throw new MessageException("Saved the records before generating the new sequence." + SideNotes);
+            throw new MessageException("Sequence generated!" + SideNotes);
         }
 
         public void LoadSequence(string SequenceFilename)
@@ -831,21 +897,25 @@ namespace DotProbe
                 SaveRecords();
 
             Sequence.Clear();
-            XElement SequenceXML = XElement.Load(SequenceFilename);
-            foreach (XElement ItemXML in SequenceXML.Elements("Item"))
+            try
             {
-                Sequence.Add(new Tuple<Tuple<bool, string>, Tuple<bool, string>, DotPosition>(
-                        new Tuple<bool, string>(
-                            System.Convert.ToBoolean(ItemXML.Element("Threatening1").Value),
-                            ItemXML.Element("Word1").Value
-                        ),
-                        new Tuple<bool, string>(
-                            System.Convert.ToBoolean(ItemXML.Element("Threatening2").Value),
-                            ItemXML.Element("Word2").Value
-                        ),
-                        (DotPosition)System.Convert.ToInt32(ItemXML.Element("DotPosition").Value)
-                    ));
+                XElement SequenceXML = XElement.Load(SequenceFilename);
+                foreach (XElement ItemXML in SequenceXML.Elements("Item"))
+                {
+                    Sequence.Add(new Tuple<Tuple<bool, string>, Tuple<bool, string>, DotPosition>(
+                            new Tuple<bool, string>(
+                                System.Convert.ToBoolean(ItemXML.Element("Threatening1").Value),
+                                ItemXML.Element("Word1").Value
+                            ),
+                            new Tuple<bool, string>(
+                                System.Convert.ToBoolean(ItemXML.Element("Threatening2").Value),
+                                ItemXML.Element("Word2").Value
+                            ),
+                            (DotPosition)System.Convert.ToInt32(ItemXML.Element("DotPosition").Value)
+                        ));
+                }
             }
+            catch (Exception e) { throw new MessageException("Couldn't read the XML file: " + e.Message); }
 
             if (UnsavedRecords)
                 throw new MessageException("Saved the records before loading the new sequence.");
@@ -1052,6 +1122,7 @@ namespace DotProbe
 
         public double ThreateningWordsProbability;
         public double OpositeSideDotProbability;
+        public bool AllowWordRepeat;
 
         public bool VerticalSides;
         public double SidesOffset;
@@ -1085,6 +1156,7 @@ namespace DotProbe
 
             ThreateningWordsProbability = 66;
             OpositeSideDotProbability = 50;
+            AllowWordRepeat = false;
 
             VerticalSides = true;
             SidesOffset = 200;
@@ -1107,6 +1179,8 @@ namespace DotProbe
                     foreach (XElement element in xml_settings.Elements())
                         try
                         {
+                            double tempD;
+                            int tempI;
                             switch (element.Name.LocalName)
                             {
                                 case "Fullscreen":
@@ -1125,28 +1199,50 @@ namespace DotProbe
                                     ThreateningWordsListFilename = element.Value;
                                     break;
                                 case "ThreateningWordsProbability":
-                                    ThreateningWordsProbability = System.Convert.ToDouble(element.Value);
+                                    tempD = System.Convert.ToDouble(element.Value);
+                                    if (tempD >= 0 && tempD <= 100)
+                                        ThreateningWordsProbability = tempD;
                                     break;
                                 case "OpositeSideDotProbability":
-                                    OpositeSideDotProbability = System.Convert.ToDouble(element.Value);
+                                    tempD = System.Convert.ToDouble(element.Value);
+                                    if (tempD >= 0 && tempD <= 100)
+                                        OpositeSideDotProbability = tempD;
+                                    break;
+                                case "AllowWordRepeat":
+                                    AllowWordRepeat = System.Convert.ToBoolean(element.Value);
                                     break;
                                 case "VerticalSides":
                                     VerticalSides = System.Convert.ToBoolean(element.Value);
                                     break;
                                 case "SidesOffset":
-                                    SidesOffset = System.Convert.ToDouble(element.Value);
+                                    tempD = System.Convert.ToDouble(element.Value);
+                                    if (tempD < 0)
+                                        tempD = -tempD;
+                                    SidesOffset = tempD;
                                     break;
                                 case "FontSize":
-                                    FontSize = System.Convert.ToDouble(element.Value);
+                                    tempD = System.Convert.ToDouble(element.Value);
+                                    if (tempD < 0)
+                                        tempD = -tempD;
+                                    FontSize = tempD;
                                     break;
                                 case "DotSize":
-                                    DotSize = System.Convert.ToDouble(element.Value);
+                                    tempD = System.Convert.ToDouble(element.Value);
+                                    if (tempD < 0)
+                                        tempD = -tempD;
+                                    DotSize = tempD;
                                     break;
                                 case "WaitTime":
-                                    WaitTime = System.Convert.ToInt32(element.Value);
+                                    tempI = System.Convert.ToInt32(element.Value);
+                                    if (tempI < 0)
+                                        tempI = -tempI;
+                                    WaitTime = tempI;
                                     break;
                                 case "WordsDisplayTime":
-                                    WordsDisplayTime = System.Convert.ToInt32(element.Value);
+                                    tempI = System.Convert.ToInt32(element.Value);
+                                    if (tempI < 0)
+                                        tempI = -tempI;
+                                    WordsDisplayTime = tempI;
                                     break;
                                 case "CenterText":
                                     CenterText = element.Value;
@@ -1177,6 +1273,7 @@ namespace DotProbe
                 new XElement("ThreateningWordsListFilename", ThreateningWordsListFilename),
                 new XElement("ThreateningWordsProbability", ThreateningWordsProbability),
                 new XElement("OpositeSideDotProbability", OpositeSideDotProbability),
+                new XElement("AllowWordRepeat", AllowWordRepeat),
                 new XElement("VerticalSides", VerticalSides),
                 new XElement("SidesOffset", SidesOffset),
                 new XElement("FontSize", FontSize),
