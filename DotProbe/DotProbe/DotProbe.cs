@@ -713,6 +713,8 @@ namespace DotProbe
                     else if (e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition1.ToUpper()
                             || e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition2.ToUpper())
                     {
+                        Behavior.WrongResponse();
+
                         if (UseCustomBeep) try
                         {
                             CustomBeep.Stop();
@@ -956,7 +958,7 @@ namespace DotProbe
             if (Sequence.Count == 0)
                 throw new MessageException("No sequence is loaded!\nGenerate or Load to start.");
             SequenceIndex = -1;
-            Records.Add(new Tuple<string, int, List<double>>(UserName, Age, new List<double>()));
+            Records.Add(new Tuple<string, int, List<Tuple<double, int>>>(UserName, Age, new List<Tuple<double, int>>()));
         }
 
         public Tuple<Tuple<bool, string>, Tuple<bool, string>, DotPosition> GetNext()
@@ -976,12 +978,28 @@ namespace DotProbe
             StartTime = DateTime.Now;
         }
 
+        public void WrongResponse()
+        {
+            if (Records[Records.Count - 1].Item3.Count > SequenceIndex)
+                Records[Records.Count - 1].Item3[SequenceIndex] =
+                    new Tuple<double, int>(
+                        Records[Records.Count - 1].Item3[SequenceIndex].Item1, // Unchanged
+                        Records[Records.Count - 1].Item3[SequenceIndex].Item2 + 1
+                        );
+            else
+                Records[Records.Count - 1].Item3.Add(new Tuple<double, int>((DateTime.Now - StartTime).TotalSeconds, 1));
+        }
+
         public void StopTimer()
         {
             if (Records[Records.Count - 1].Item3.Count > SequenceIndex)
-                Records[Records.Count - 1].Item3[SequenceIndex] = (DateTime.Now - StartTime).TotalSeconds;
+                Records[Records.Count - 1].Item3[SequenceIndex] =
+                    new Tuple<double, int>(
+                        (DateTime.Now - StartTime).TotalSeconds,
+                        Records[Records.Count - 1].Item3[SequenceIndex].Item2 // Unchanged
+                        );
             else
-                Records[Records.Count - 1].Item3.Add((DateTime.Now - StartTime).TotalSeconds);
+                Records[Records.Count - 1].Item3.Add(new Tuple<double, int>((DateTime.Now - StartTime).TotalSeconds, 0));
         }
 
         void StopSequence()
@@ -1014,7 +1032,7 @@ namespace DotProbe
             System.IO.FileStream file = System.IO.File.Create(Filename);
             file.Close();
 
-            string[,] ContentsArray = new string[4 + Sequence.Count, 6 + Records.Count];
+            string[,] ContentsArray = new string[5 + Sequence.Count + 1 + Sequence.Count, 6 + Records.Count];
             int Stage = 0;
 
             for (int j = 0; j < 5; j++) ContentsArray[Stage, j] = "";
@@ -1041,7 +1059,7 @@ namespace DotProbe
                     Types.Add(CombinationType.DotOnNeutral);
 
             for (int j = 0; j < 5; j++) ContentsArray[Stage, j] = "";
-            ContentsArray[Stage, 5] = "Attention Bias";
+            ContentsArray[Stage, 5] = "AttentionBias";
             for (int j = 0; j < Records.Count; j++)
             {
                 double UP_LE = 0; // Upper-dot Lower-emotional-word
@@ -1065,24 +1083,24 @@ namespace DotProbe
                         case CombinationType.DotOnNeutral:
                             if (Sequence[i].Item1.Item1)
                             {
-                                LP_UE += Records[j].Item3[i];
+                                LP_UE += Records[j].Item3[i].Item1;
                                 LP_UE_C += 1;
                             }
                             else
                             {
-                                UP_LE += Records[j].Item3[i];
+                                UP_LE += Records[j].Item3[i].Item1;
                                 UP_LE_C += 1;
                             }
                             break;
                         case CombinationType.DotOnThreatening:
                             if (Sequence[i].Item1.Item1)
                             {
-                                UP_UE += Records[j].Item3[i];
+                                UP_UE += Records[j].Item3[i].Item1;
                                 UP_UE_C += 1;
                             }
                             else
                             {
-                                LP_LE += Records[j].Item3[i];
+                                LP_LE += Records[j].Item3[i].Item1;
                                 LP_LE_C += 1;
                             }
                             break;
@@ -1098,6 +1116,22 @@ namespace DotProbe
             }
             Stage++; // => 3
 
+            for (int j = 0; j < 5; j++) ContentsArray[Stage, j] = "";
+            ContentsArray[Stage, 5] = "WrongResponsedDots";
+            for (int j = 0; j < Records.Count; j++)
+            {
+                int C = 0;
+                for (int i = 0; i < Sequence.Count; i++)
+                {
+                    if (Records[j].Item3.Count <= i)
+                        break;
+                    if (Records[j].Item3[i].Item2 > 0)
+                        C++;
+                }
+                ContentsArray[Stage, j + 6] = C.ToString();
+            }
+            Stage++; // => 4
+
             ContentsArray[Stage, 0] = "Word1";
             ContentsArray[Stage, 1] = "IsThreatening1";
             ContentsArray[Stage, 2] = "Word2";
@@ -1106,25 +1140,56 @@ namespace DotProbe
             ContentsArray[Stage, 5] = "Type";
             for (int j = 0; j < Records.Count; j++)
                 ContentsArray[Stage, j + 6] = "ReactionTime";
-            Stage++; // => 4
+            Stage++; // => 5
 
             for (int i = 0; i < Sequence.Count; i++)
             {
-                int stage_plus_i = Stage + i;
-                ContentsArray[stage_plus_i, 0] = Sequence[i].Item1.Item2;
-                ContentsArray[stage_plus_i, 1] = Sequence[i].Item1.Item1.ToString();
-                ContentsArray[stage_plus_i, 2] = Sequence[i].Item2.Item2;
-                ContentsArray[stage_plus_i, 3] = Sequence[i].Item2.Item1.ToString();
-                ContentsArray[stage_plus_i, 4] = ((int)Sequence[i].Item3).ToString();
-                ContentsArray[stage_plus_i, 5] = Types[i].ToString();
+                ContentsArray[Stage, 0] = Sequence[i].Item1.Item2;
+                ContentsArray[Stage, 1] = Sequence[i].Item1.Item1.ToString();
+                ContentsArray[Stage, 2] = Sequence[i].Item2.Item2;
+                ContentsArray[Stage, 3] = Sequence[i].Item2.Item1.ToString();
+                ContentsArray[Stage, 4] = ((int)Sequence[i].Item3).ToString();
+                ContentsArray[Stage, 5] = Types[i].ToString();
 
                 for (int j = 0; j < Records.Count; j++)
                 {
                     if (Records[j].Item3.Count > i)
-                        ContentsArray[stage_plus_i, j + 6] = Records[j].Item3[i].ToString();
+                        ContentsArray[Stage, j + 6] = Records[j].Item3[i].Item1.ToString();
                     else
-                        ContentsArray[stage_plus_i, j + 6] = "N/A";
+                        ContentsArray[Stage, j + 6] = "N/A";
                 }
+
+                Stage++;
+            }
+
+            ContentsArray[Stage, 0] = "Word1";
+            ContentsArray[Stage, 1] = "IsThreatening1";
+            ContentsArray[Stage, 2] = "Word2";
+            ContentsArray[Stage, 3] = "IsThreatening2";
+            ContentsArray[Stage, 4] = "DotPosition";
+            ContentsArray[Stage, 5] = "Type";
+            for (int j = 0; j < Records.Count; j++)
+                ContentsArray[Stage, j + 6] = "WrongResponses";
+            Stage++; // => 5 + Sequence.Count + 1
+
+            for (int i = 0; i < Sequence.Count; i++)
+            {
+                ContentsArray[Stage, 0] = Sequence[i].Item1.Item2;
+                ContentsArray[Stage, 1] = Sequence[i].Item1.Item1.ToString();
+                ContentsArray[Stage, 2] = Sequence[i].Item2.Item2;
+                ContentsArray[Stage, 3] = Sequence[i].Item2.Item1.ToString();
+                ContentsArray[Stage, 4] = ((int)Sequence[i].Item3).ToString();
+                ContentsArray[Stage, 5] = Types[i].ToString();
+
+                for (int j = 0; j < Records.Count; j++)
+                {
+                    if (Records[j].Item3.Count > i)
+                        ContentsArray[Stage, j + 6] = Records[j].Item3[i].Item2.ToString();
+                    else
+                        ContentsArray[Stage, j + 6] = "N/A";
+                }
+
+                Stage++;
             }
 
             string Contents = "";
@@ -1159,8 +1224,8 @@ namespace DotProbe
         // Tuple<Tuple<IsThreatening, Word>, Tuple<IsThreatening, Word>, DotPosition>
         List<Tuple<Tuple<bool, string>, Tuple<bool, string>, DotPosition>> Sequence = new List<Tuple<Tuple<bool, string>, Tuple<bool, string>, DotPosition>>();
         int SequenceIndex = -1;
-        // Tuple<UserName, Age, List<ReactionTime>>
-        List<Tuple<string, int, List<double>>> Records = new List<Tuple<string, int, List<double>>>();
+        // Tuple<UserName, Age, List<Tuple<ReactionTime, WrongResponsesCount>>>
+        List<Tuple<string, int, List<Tuple<double, int>>>> Records = new List<Tuple<string, int, List<Tuple<double, int>>>>();
 
         DateTime StartTime;
     }
