@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace DotProbe
@@ -345,6 +347,14 @@ namespace DotProbe
 
             MainGrid.Children.Add(DotProbeGrid);
 
+            if (Behavior.Settings.CustomBeepFilename != "") try
+            {
+                CustomBeep = new MediaPlayer();
+                CustomBeep.Open(new Uri(Behavior.Settings.CustomBeepFilename, UriKind.RelativeOrAbsolute));
+                UseCustomBeep = true;
+            }
+            catch (Exception) { }
+
             // Message (Error/Warning) --------------------------------
 
             Grid MessageGrid = new Grid
@@ -625,8 +635,9 @@ namespace DotProbe
                     DarkModeToggle.Value = !DarkModeToggle.Value;
                 }
 
-                if (DotProbeGrid.Visibility == System.Windows.Visibility.Visible && !DisplayingWords
-                    && (CurrentItem == null ?
+                if (DotProbeGrid.Visibility == System.Windows.Visibility.Visible && !DisplayingWords)
+                {
+                    if (CurrentItem == null ?
                         (e.Key == System.Windows.Input.Key.Enter
                             || e.Key == System.Windows.Input.Key.Space
                             || e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition1.ToUpper()
@@ -634,33 +645,55 @@ namespace DotProbe
                         : ((e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition1.ToUpper()
                                 && CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position1)
                             || (e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition2.ToUpper()
-                                && CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2))))
-                {
-                    DisplayingWords = true;
-                    if ((string)CenterLabel.Content == Behavior.Settings.CenterText)
+                                && CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2)))
                     {
-                        Behavior.StopTimer();
-
-                        Dot1.Visibility = System.Windows.Visibility.Hidden;
-                        Dot2.Visibility = System.Windows.Visibility.Hidden;
-                        CenterLabel.Content = "";
-
-                        CurrentItem = Behavior.GetNext();
-                        if (CurrentItem == null)
+                        DisplayingWords = true;
+                        if ((string)CenterLabel.Content == Behavior.Settings.CenterText)
                         {
-                            ShowMessage("Test done.", 0);
-                            bool Animations = CustomControls.GlobalSettings.Animations;
-                            await Task.Delay(CustomControls.GlobalSettings.Animations ?
-                                                CustomControls.GlobalSettings.AnimationDurationInMilliseconds + 100
-                                                : 100);
-                            CustomControls.GlobalSettings.Animations = false;
-                            HideGrid(DotProbeGrid, DotProbeToken);
-                            CustomControls.GlobalSettings.Animations = Animations;
+                            Behavior.StopTimer();
+
+                            Dot1.Visibility = System.Windows.Visibility.Hidden;
+                            Dot2.Visibility = System.Windows.Visibility.Hidden;
+                            CenterLabel.Content = "";
+
+                            CurrentItem = Behavior.GetNext();
+                            if (CurrentItem == null)
+                            {
+                                ShowMessage("Test done.", 0);
+                                bool Animations = CustomControls.GlobalSettings.Animations;
+                                await Task.Delay(CustomControls.GlobalSettings.Animations ?
+                                                    CustomControls.GlobalSettings.AnimationDurationInMilliseconds + 100
+                                                    : 100);
+                                CustomControls.GlobalSettings.Animations = false;
+                                HideGrid(DotProbeGrid, DotProbeToken);
+                                CustomControls.GlobalSettings.Animations = Animations;
+                            }
+                            else
+                            {
+                                await Task.Delay(Behavior.Settings.WaitTime);
+
+                                CenterLabel.Content = Behavior.Settings.CenterText;
+                                Word1.Content = CurrentItem.Item1.Item2;
+                                Word2.Content = CurrentItem.Item2.Item2;
+
+                                await Task.Delay(Behavior.Settings.WordsDisplayTime);
+
+                                Behavior.StartTimer();
+                                Word1.Content = "";
+                                Word2.Content = "";
+                                if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position1)
+                                    Dot1.Visibility = System.Windows.Visibility.Visible;
+                                else if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2)
+                                    Dot2.Visibility = System.Windows.Visibility.Visible;
+                            }
                         }
-                        else
+                        else // First
                         {
+                            CenterLabel.Content = "";
+
                             await Task.Delay(Behavior.Settings.WaitTime);
 
+                            CurrentItem = Behavior.GetNext();
                             CenterLabel.Content = Behavior.Settings.CenterText;
                             Word1.Content = CurrentItem.Item1.Item2;
                             Word2.Content = CurrentItem.Item2.Item2;
@@ -675,29 +708,24 @@ namespace DotProbe
                             else if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2)
                                 Dot2.Visibility = System.Windows.Visibility.Visible;
                         }
+                        DisplayingWords = false;
                     }
-                    else // First
+                    else if (e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition1.ToUpper()
+                            || e.Key.ToString().ToUpper() == Behavior.Settings.KeyForDotPosition2.ToUpper())
                     {
-                        CenterLabel.Content = "";
+                        if (UseCustomBeep) try
+                        {
+                            CustomBeep.Stop();
+                            CustomBeep.Play();
+                            return;
+                        }
+                        catch (Exception) { UseCustomBeep = false; }
 
-                        await Task.Delay(Behavior.Settings.WaitTime);
-
-                        CurrentItem = Behavior.GetNext();
-                        CenterLabel.Content = Behavior.Settings.CenterText;
-                        Word1.Content = CurrentItem.Item1.Item2;
-                        Word2.Content = CurrentItem.Item2.Item2;
-
-                        await Task.Delay(Behavior.Settings.WordsDisplayTime);
-
-                        Behavior.StartTimer();
-                        Word1.Content = "";
-                        Word2.Content = "";
-                        if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position1)
-                            Dot1.Visibility = System.Windows.Visibility.Visible;
-                        else if (CurrentItem.Item3 == DotProbeBehavior.DotPosition.Position2)
-                            Dot2.Visibility = System.Windows.Visibility.Visible;
+                        if (Behavior.Settings.BeepFromSystemSounds)
+                            SystemSounds.Beep.Play();
+                        else
+                            Console.Beep();
                     }
-                    DisplayingWords = false;
                 }
             };
 
@@ -737,6 +765,9 @@ namespace DotProbe
         //CustomControls.Ptr<int> SettingsToken = new CustomControls.Ptr<int>(0);
         CustomControls.Ptr<int> DotProbeToken = new CustomControls.Ptr<int>(0);
         CustomControls.Ptr<int> MessageToken = new CustomControls.Ptr<int>(0);
+
+        MediaPlayer CustomBeep;
+        bool UseCustomBeep = false;
     }
 
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -1137,6 +1168,9 @@ namespace DotProbe
         public string KeyForDotPosition1;
         public string KeyForDotPosition2;
 
+        public bool BeepFromSystemSounds;
+        public string CustomBeepFilename;
+
         public Settings()
         {
             Reset();
@@ -1172,6 +1206,9 @@ namespace DotProbe
 
             KeyForDotPosition1 = "Up";
             KeyForDotPosition2 = "Down";
+
+            BeepFromSystemSounds = false;
+            CustomBeepFilename = "";
         }
 
         public void Load()
@@ -1261,6 +1298,12 @@ namespace DotProbe
                                 case "KeyForDotPosition2":
                                     KeyForDotPosition2 = element.Value;
                                     break;
+                                case "BeepFromSystemSounds":
+                                    BeepFromSystemSounds = System.Convert.ToBoolean(element.Value);
+                                    break;
+                                case "CustomBeepFilename":
+                                    CustomBeepFilename = element.Value;
+                                    break;
                                 default:
                                     break;
                             }
@@ -1291,7 +1334,9 @@ namespace DotProbe
                 new XElement("WordsDisplayTime", WordsDisplayTime),
                 new XElement("CenterText", CenterText),
                 new XElement("KeyForDotPosition1", KeyForDotPosition1),
-                new XElement("KeyForDotPosition2", KeyForDotPosition2)
+                new XElement("KeyForDotPosition2", KeyForDotPosition2),
+                new XElement("BeepFromSystemSounds", BeepFromSystemSounds),
+                new XElement("CustomBeepFilename", CustomBeepFilename)
                 );
             xml_settings.Save(SettingsFilename);
         }
