@@ -850,14 +850,6 @@ namespace DotProbe
                     else                                       { SwapN(Word1Index, NeutralWordsLength     - 1); NeutralWordsLength--; }
                     if (!IsWord1Threatening && HasThreatening) { SwapT(Word2Index, ThreateningWordsLength - 1); ThreateningWordsLength--; }
                     else                                       { SwapN(Word2Index, NeutralWordsLength     - 1); NeutralWordsLength--; }
-
-                    // And reduce their accepted lengths.
-                    //if (HasThreatening) { ThreateningWordsLength--; NeutralWordsLength--; }
-                    //else { NeutralWordsLength -= 2; }
-                    foreach (var item in NeutralWords) { Console.Write(item[item.Length - 1]); }
-                    Console.WriteLine();
-                    foreach (var item in ThreateningWords) { Console.Write(item[item.Length - 1]); }
-                    Console.WriteLine();
                 }
 
                 DotPosition Dot = (Rand.NextDouble() < Settings.OpositeSideDotProbability / 100) ?
