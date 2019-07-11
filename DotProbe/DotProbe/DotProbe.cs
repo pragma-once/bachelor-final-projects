@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -273,6 +273,8 @@ namespace DotProbe
                 Padding = new System.Windows.Thickness(0),
                 FontSize = Behavior.Settings.FontSize
             };
+            if (Behavior.Settings.FontFamily != "")
+                CenterLabel.FontFamily = new System.Windows.Media.FontFamily(Behavior.Settings.FontFamily);
             DotProbeGrid.Children.Add(CenterLabel);
 
             Label Word1 = new Label
@@ -289,6 +291,8 @@ namespace DotProbe
                             : new System.Windows.Thickness(-Behavior.Settings.SidesOffset, 0, 0, 0),
                 FontSize = Behavior.Settings.FontSize
             };
+            if (Behavior.Settings.FontFamily != "")
+                Word1.FontFamily = new System.Windows.Media.FontFamily(Behavior.Settings.FontFamily);
             DotProbeGrid.Children.Add(Word1);
 
             Label Word2 = new Label
@@ -305,6 +309,8 @@ namespace DotProbe
                             : new System.Windows.Thickness(0, 0, -Behavior.Settings.SidesOffset, 0),
                 FontSize = Behavior.Settings.FontSize
             };
+            if (Behavior.Settings.FontFamily != "")
+                Word2.FontFamily = new System.Windows.Media.FontFamily(Behavior.Settings.FontFamily);
             DotProbeGrid.Children.Add(Word2);
 
             System.Windows.Shapes.Ellipse Dot1 = new System.Windows.Shapes.Ellipse
@@ -1129,8 +1135,10 @@ namespace DotProbe
         public double FontSize;
         public double DotSize;
 
-        public int WaitTime = 250;
-        public int WordsDisplayTime = 500;
+        public string FontFamily;
+
+        public int WaitTime;
+        public int WordsDisplayTime;
 
         public string CenterText;
 
@@ -1162,6 +1170,11 @@ namespace DotProbe
             SidesOffset = 200;
             FontSize = 40;
             DotSize = 8;
+
+            FontFamily = "";
+
+            WaitTime = 250;
+            WordsDisplayTime = 500;
 
             CenterText = "+";
 
@@ -1232,6 +1245,9 @@ namespace DotProbe
                                         tempD = -tempD;
                                     DotSize = tempD;
                                     break;
+                                case "FontFamily":
+                                    FontFamily = element.Value;
+                                    break;
                                 case "WaitTime":
                                     tempI = System.Convert.ToInt32(element.Value);
                                     if (tempI < 0)
@@ -1278,6 +1294,7 @@ namespace DotProbe
                 new XElement("SidesOffset", SidesOffset),
                 new XElement("FontSize", FontSize),
                 new XElement("DotSize", DotSize),
+                new XElement("FontFamily", FontFamily),
                 new XElement("WaitTime", WaitTime),
                 new XElement("WordsDisplayTime", WordsDisplayTime),
                 new XElement("CenterText", CenterText),
