@@ -1014,17 +1014,20 @@ namespace DotProbe
             System.IO.FileStream file = System.IO.File.Create(Filename);
             file.Close();
 
-            string Contents = "";
+            string[,] ContentsArray = new string[4 + Sequence.Count, 6 + Records.Count];
+            int Stage = 0;
 
-            Contents += "Name,,,,,";
+            for (int j = 0; j < 5; j++) ContentsArray[Stage, j] = "";
+            ContentsArray[Stage, 5] = "Name";
             for (int j = 0; j < Records.Count; j++)
-                Contents += "," + Records[j].Item1;
-            Contents += "\n";
+                ContentsArray[Stage, j + 6] = Records[j].Item1;
+            Stage++; // => 1
 
-            Contents += "Age,,,,,";
+            for (int j = 0; j < 5; j++) ContentsArray[Stage, j] = "";
+            ContentsArray[Stage, 5] = "Age";
             for (int j = 0; j < Records.Count; j++)
-                Contents += "," + Records[j].Item2;
-            Contents += "\n";
+                ContentsArray[Stage, j + 6] = Records[j].Item2.ToString();
+            Stage++; // => 2
 
             List<CombinationType> Types = new List<CombinationType>(Sequence.Count);
             for (int i = 0; i < Sequence.Count; i++)
@@ -1037,7 +1040,8 @@ namespace DotProbe
                 else
                     Types.Add(CombinationType.DotOnNeutral);
 
-            Contents += "Attention Bias,,,,,";
+            for (int j = 0; j < 5; j++) ContentsArray[Stage, j] = "";
+            ContentsArray[Stage, 5] = "Attention Bias";
             for (int j = 0; j < Records.Count; j++)
             {
                 double UP_LE = 0; // Upper-dot Lower-emotional-word
@@ -1090,33 +1094,57 @@ namespace DotProbe
                 if (UP_UE_C != 0) UP_UE /= UP_UE_C;
                 if (LP_UE_C != 0) LP_UE /= LP_UE_C;
                 if (LP_LE_C != 0) LP_LE /= LP_LE_C;
-                Contents += "," + (((UP_LE - UP_UE) + (LP_UE - LP_LE)) / 2).ToString();
+                ContentsArray[Stage, j + 6] = (((UP_LE - UP_UE) + (LP_UE - LP_LE)) / 2).ToString();
             }
-            Contents += "\n";
+            Stage++; // => 3
 
-            Contents += "Word1,IsThreatening1,Word2,IsThreatening2,DotPosition,Type";
+            ContentsArray[Stage, 0] = "Word1";
+            ContentsArray[Stage, 1] = "IsThreatening1";
+            ContentsArray[Stage, 2] = "Word2";
+            ContentsArray[Stage, 3] = "IsThreatening2";
+            ContentsArray[Stage, 4] = "DotPosition";
+            ContentsArray[Stage, 5] = "Type";
             for (int j = 0; j < Records.Count; j++)
-                Contents += ",ReactionTime";
-            Contents += "\n";
+                ContentsArray[Stage, j + 6] = "ReactionTime";
+            Stage++; // => 4
 
             for (int i = 0; i < Sequence.Count; i++)
             {
-                Contents += Sequence[i].Item1.Item2
-                        + "," + Sequence[i].Item1.Item1
-                        + "," + Sequence[i].Item2.Item2
-                        + "," + Sequence[i].Item2.Item1
-                        + "," + ((int)Sequence[i].Item3).ToString()
-                        + "," + Types[i].ToString();
+                int stage_plus_i = Stage + i;
+                ContentsArray[stage_plus_i, 0] = Sequence[i].Item1.Item2;
+                ContentsArray[stage_plus_i, 1] = Sequence[i].Item1.Item1.ToString();
+                ContentsArray[stage_plus_i, 2] = Sequence[i].Item2.Item2;
+                ContentsArray[stage_plus_i, 3] = Sequence[i].Item2.Item1.ToString();
+                ContentsArray[stage_plus_i, 4] = ((int)Sequence[i].Item3).ToString();
+                ContentsArray[stage_plus_i, 5] = Types[i].ToString();
 
                 for (int j = 0; j < Records.Count; j++)
                 {
                     if (Records[j].Item3.Count > i)
-                        Contents += "," + Records[j].Item3[i];
+                        ContentsArray[stage_plus_i, j + 6] = Records[j].Item3[i].ToString();
                     else
-                        Contents += ",N/A";
+                        ContentsArray[stage_plus_i, j + 6] = "N/A";
                 }
-                Contents += '\n';
             }
+
+            string Contents = "";
+
+            if (Settings.RowPerRecordResultsOrientation)
+                for (int j = 0; j < ContentsArray.GetLength(1); j++)
+                {
+                    Contents += ContentsArray[0, j];
+                    for (int i = 1; i < ContentsArray.GetLength(0); i++)
+                        Contents += ',' + ContentsArray[i, j];
+                    Contents += '\n';
+                }
+            else
+                for (int i = 0; i < ContentsArray.GetLength(0); i++)
+                {
+                    Contents += ContentsArray[i, 0];
+                    for (int j = 1; j < ContentsArray.GetLength(1); j++)
+                        Contents += ',' + ContentsArray[i, j];
+                    Contents += '\n';
+                }
 
             System.IO.File.WriteAllText(Filename, Contents);
 
@@ -1171,6 +1199,8 @@ namespace DotProbe
         public bool BeepFromSystemSounds;
         public string CustomBeepFilename;
 
+        public bool RowPerRecordResultsOrientation;
+
         public Settings()
         {
             Reset();
@@ -1209,6 +1239,8 @@ namespace DotProbe
 
             BeepFromSystemSounds = false;
             CustomBeepFilename = "";
+
+            RowPerRecordResultsOrientation = true;
         }
 
         public void Load()
@@ -1304,6 +1336,9 @@ namespace DotProbe
                                 case "CustomBeepFilename":
                                     CustomBeepFilename = element.Value;
                                     break;
+                                case "RowPerRecordResultsOrientation":
+                                    RowPerRecordResultsOrientation = System.Convert.ToBoolean(element.Value);
+                                    break;
                                 default:
                                     break;
                             }
@@ -1336,7 +1371,8 @@ namespace DotProbe
                 new XElement("KeyForDotPosition1", KeyForDotPosition1),
                 new XElement("KeyForDotPosition2", KeyForDotPosition2),
                 new XElement("BeepFromSystemSounds", BeepFromSystemSounds),
-                new XElement("CustomBeepFilename", CustomBeepFilename)
+                new XElement("CustomBeepFilename", CustomBeepFilename),
+                new XElement("RowPerRecordResultsOrientation", RowPerRecordResultsOrientation)
                 );
             xml_settings.Save(SettingsFilename);
         }
