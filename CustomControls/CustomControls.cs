@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
+using System.Windows.Media.Media3D;
+using System.Windows.Shapes;
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
@@ -361,9 +364,9 @@ namespace CustomControls
         SolidColorBrush BGBrush = new SolidColorBrush();
         SolidColorBrush FGBrush = new SolidColorBrush();
 
-        byte FGBrightness  = 0;
+        byte FGBrightness = 0;
         const byte MidBrightness = 127;
-        byte BGBrightness  = 255;
+        byte BGBrightness = 255;
         double ThumbPosition = 0; // [0, 1]
         double ThumbShrinkage = 1; // [0, 1]
 
@@ -441,7 +444,7 @@ namespace CustomControls
                         (double h) => { H = h; UpdateColors(); },
                         GlobalSettings.AnimationSpeed * 2,
                         H, 1);
-                else H = 1;
+                else { H = 1; UpdateColors(); }
             };
 
             MainGrid.MouseLeave += (object sender, System.Windows.Input.MouseEventArgs e) =>
@@ -463,6 +466,7 @@ namespace CustomControls
                 {
                     H = 0;
                     P = 0;
+                    UpdateColors();
                 }
                 ClickPotential = false;
             };
@@ -476,7 +480,7 @@ namespace CustomControls
                         (double p) => { P = p; UpdateColors(); },
                         GlobalSettings.AnimationSpeed * 4,
                         P, 1);
-                else P = 1;
+                else { P = 1; UpdateColors(); }
                 MainGrid.Focus();
             };
 
@@ -493,7 +497,7 @@ namespace CustomControls
                         (double p) => { P = p; UpdateColors(); },
                         PSpeed,
                         P, 0);
-                else P = 0;
+                else { P = 0; UpdateColors(); }
             };
         }
 
@@ -537,6 +541,319 @@ namespace CustomControls
             byte BG = (byte)(Normal + (Mid - Normal) * (H * HShade + P * PShade));
             BGBrush.Color = Color.FromArgb(255, BG, BG, BG);
             FGBrush.Color = Color.FromArgb(255, FG, FG, FG);
+        }
+    }
+
+    class HueBar : ShaderEffect
+    {
+        public HueBar()
+        {
+            PixelShader = new PixelShader
+            {
+                UriSource = new Uri(
+                    "pack://application:,,,/"
+                    + typeof(HueBar).Assembly.GetName().Name.Split(',')[0]
+                    + ";component/HueBar.ps"
+                )
+            };
+            UpdateShaderValue(InputProperty);
+            UpdateShaderValue(CenterSizeProperty);
+            UpdateShaderValue(CursorPositionProperty);
+            UpdateShaderValue(CursorSizeProperty);
+            UpdateShaderValue(CenterDotColorProperty);
+            UpdateShaderValue(CenterDotSizeProperty);
+            UpdateShaderValue(AAProperty);
+        }
+
+        public static readonly DependencyProperty InputProperty = ShaderEffect.RegisterPixelShaderSamplerProperty("Input", typeof(HueBar), 0);
+        public Brush Input
+        {
+            get => ((Brush)(GetValue(InputProperty)));
+            set => SetValue(InputProperty, value);
+        }
+
+        public static readonly DependencyProperty CenterSizeProperty = DependencyProperty.Register("CenterSize", typeof(double), typeof(HueBar),
+                                                                                                    new UIPropertyMetadata(0.7, PixelShaderConstantCallback(0)));
+        public double CenterSize
+        {
+            get => ((double)(GetValue(CenterSizeProperty)));
+            set => SetValue(CenterSizeProperty, value);
+        }
+
+        public static readonly DependencyProperty CursorPositionProperty = DependencyProperty.Register("CursorPosition", typeof(double), typeof(HueBar),
+                                                                                                        new UIPropertyMetadata(0.0, PixelShaderConstantCallback(1)));
+        public double CursorPosition
+        {
+            get => ((double)(GetValue(CursorPositionProperty)));
+            set => SetValue(CursorPositionProperty, value);
+        }
+
+        public static readonly DependencyProperty CursorSizeProperty = DependencyProperty.Register("CursorSize", typeof(double), typeof(HueBar),
+                                                                                                    new UIPropertyMetadata(0.0, PixelShaderConstantCallback(2)));
+        public double CursorSize
+        {
+            get => ((double)(GetValue(CursorSizeProperty)));
+            set => SetValue(CursorSizeProperty, value);
+        }
+
+        public static readonly DependencyProperty CenterDotColorProperty = DependencyProperty.Register("CenterDotColor", typeof(Point4D), typeof(HueBar),
+                                                                                            new UIPropertyMetadata(new Point4D(0, 0, 0, 0), PixelShaderConstantCallback(3)));
+        public Point4D CenterDotColor
+        {
+            get => ((Point4D)(GetValue(CenterDotColorProperty)));
+            set => SetValue(CenterDotColorProperty, value);
+        }
+
+        public static readonly DependencyProperty CenterDotSizeProperty = DependencyProperty.Register("CenterDotSize", typeof(double), typeof(HueBar),
+                                                                                                    new UIPropertyMetadata(0.4, PixelShaderConstantCallback(4)));
+        public double CenterDotSize
+        {
+            get => ((double)(GetValue(CenterDotSizeProperty)));
+            set => SetValue(CenterDotSizeProperty, value);
+        }
+
+        public static readonly DependencyProperty AAProperty = DependencyProperty.Register("AA", typeof(Point), typeof(HueBar),
+                                                                                            new UIPropertyMetadata(new Point(0, 0), PixelShaderConstantCallback(5)));
+        public Point AA
+        {
+            get => ((Point)(GetValue(AAProperty)));
+            set => SetValue(AAProperty, value);
+        }
+
+        public void SetSizeForAA(Point p)
+        {
+            AA = new Point(2 / p.X, 2 / p.Y);
+        }
+    }
+
+    public class ColorPicker : Control
+    {
+        public ColorPicker()
+        {
+            MainGrid.Focusable = true;
+
+            MainGrid.Effect = HueBar;
+            MainGrid.Background = new SolidColorBrush(Color.FromArgb(1, 1, 1, 1));
+
+            MainGrid.SizeChanged += (object sender, System.Windows.SizeChangedEventArgs e) =>
+            {
+                if (MainGrid.ActualWidth > 1 && MainGrid.ActualHeight > 1)
+                    HueBar.SetSizeForAA(new Point(MainGrid.ActualWidth, MainGrid.ActualHeight));
+                else HueBar.AA = new Point(0, 0);
+            };
+
+            System.Windows.Input.MouseEventHandler MouseLeave
+                = (object sender, System.Windows.Input.MouseEventArgs e) =>
+            {
+                d = 2;
+                if (GlobalSettings.Animations)
+                {
+                    Animators.Tail(
+                        HToken,
+                        (double h) => { H = h; UpdateSizes(); },
+                        H, selectedHue != null ? 0.5 : 0);
+                    if (ClickPotential) Animators.AnimateNatural(
+                        PToken,
+                        (double p) => { P = p; UpdateSizes(); },
+                        GlobalSettings.AnimationSpeed / 2,
+                        P, 0);
+
+                    double Hue = selectedHue == null ? 0 : (double)selectedHue;
+                    double temp = Math.Abs(Hue - TempSelectedHue);
+                    if (Math.Abs((Hue + 6) - TempSelectedHue) < temp) Hue += 6;
+                    else if (Math.Abs((Hue - 6) - TempSelectedHue) < temp) Hue -= 6;
+                    Animators.AnimateNatural(
+                        SelectedHueToken,
+                        (double x) => { x = x % 6; if (x < 0) x += 6; TempSelectedHue = x; UpdateHue(); },
+                        GlobalSettings.AnimationSpeed,
+                        TempSelectedHue,
+                        Hue);
+                }
+                else
+                {
+                    H = selectedHue != null ? 0.5 : 0;
+                    P = 0;
+                    UpdateSizes();
+                    TempSelectedHue = selectedHue == null ? 0 : (double)selectedHue;
+                    UpdateHue();
+                }
+                ClickPotential = false;
+            };
+
+            MainGrid.MouseMove += (object sender, System.Windows.Input.MouseEventArgs e) =>
+            {
+                Point pos = e.MouseDevice.GetPosition(MainGrid);
+                pos.X /= MainGrid.ActualWidth / 2;
+                pos.Y /= MainGrid.ActualHeight / 2;
+                pos.X -= 1;
+                pos.Y -= 1;
+
+                double new_d = Math.Sqrt(pos.X * pos.X + pos.Y * pos.Y);
+                if (new_d > 1)
+                {
+                    if (d <= 1)
+                        MouseLeave(null, null);
+                    return;
+                }
+                d = new_d;
+
+                new_d *= new_d;
+                new_d *= new_d;
+                new_d *= new_d;
+                new_d *= new_d;
+
+                new_d = 1 - new_d;
+
+                double Hue = Math.Acos(pos.Y / d) * (3 / Math.PI);
+                if (pos.X < 0) Hue += 3;
+                else Hue = 3 - Hue;
+
+                if (GlobalSettings.Animations)
+                {
+                    Animators.Tail(
+                        HToken,
+                        (double h) => { H = h; UpdateSizes(); },
+                        H,
+                        0.5 + new_d / 2
+                        );
+
+                    double temp = Math.Abs(Hue - TempSelectedHue);
+                    if (Math.Abs((Hue + 6) - TempSelectedHue) < temp) Hue += 6;
+                    else if (Math.Abs((Hue - 6) - TempSelectedHue) < temp) Hue -= 6;
+                    Animators.Tail(
+                        SelectedHueToken,
+                        (double x) => { x = x % 6; if (x < 0) x += 6; TempSelectedHue = x; UpdateHue(); },
+                        TempSelectedHue,
+                        Hue
+                        );
+                }
+                else
+                {
+                    H = pos.X * pos.Y;
+                    UpdateSizes();
+                    TempSelectedHue = Hue;
+                    UpdateHue();
+                }
+            };
+
+            MainGrid.MouseLeave += MouseLeave;
+
+            MainGrid.MouseDown += (object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+            {
+                if (d <= 1)
+                {
+                    ClickPotential = true;
+                    if (GlobalSettings.Animations)
+                        Animators.AnimateNatural(
+                            PToken,
+                            (double p) => { P = p; UpdateSizes(); },
+                            GlobalSettings.AnimationSpeed * 2,
+                            P, 1);
+                    else { P = 1; UpdateSizes(); }
+                    MainGrid.Focus();
+                }
+            };
+
+            MainGrid.MouseUp += (object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+            {
+                if (ClickPotential)
+                {
+                    ClickPotential = false;
+                    selectedHue = TempSelectedHue;
+                    UpdateHue();
+                    OnClick?.Invoke();
+                }
+                if (GlobalSettings.Animations)
+                    Animators.AnimateNatural(
+                        PToken,
+                        (double p) => { P = p; UpdateSizes(); },
+                        GlobalSettings.AnimationSpeed * 2,
+                        P, 0);
+                else { P = 0; UpdateSizes(); }
+            };
+        }
+
+        double TempSelectedHue = 0;
+        double? selectedHue = null;
+        public double? SelectedHue
+        {
+            get { return selectedHue; }
+        }
+
+        public Action OnClick;
+
+        HueBar HueBar = new HueBar();
+
+        const double CenterSizeN = 0.7;
+        const double CenterSizeH = 0.1; // offset => max 0.8
+        const double CenterSizeP = 0.025; // offset
+
+        const double CursorSizeH = 0.9;
+        const double CursorSizeP = 0.1; // offset
+
+        double d = 2;
+        double H = 0; // 0.5 normal value when selectedHue != null
+        double P = 0;
+
+        bool ClickPotential = false;
+
+        Ptr<int> HToken = new Ptr<int>(0);
+        Ptr<int> PToken = new Ptr<int>(0);
+        Ptr<int> SelectedHueToken = new Ptr<int>(0);
+
+        void UpdateSizes()
+        {
+            HueBar.CenterSize = CenterSizeN + CenterSizeH * H + CenterSizeP * P;
+            HueBar.CursorSize = CursorSizeH * H + CursorSizeP * P;
+        }
+
+        void UpdateHue()
+        {
+            if (selectedHue == null)
+                HueBar.CenterDotColor = new Point4D(0, 0, 0, 0);
+            else
+                HueBar.CenterDotColor = HueToPoint4D((double)selectedHue);
+            HueBar.CursorPosition = TempSelectedHue;
+        }
+
+        Point4D HueToPoint4D(double Hue)
+        {
+            Hue = Hue % 6;
+            if (Hue < 0) Hue += 6;
+            if (Hue < 1) // [0, 1)
+                return new Point4D(1, Hue, 0, 1);     // R = 1, G = 0=>1
+            else if (Hue < 2) // [1, 2)
+                return new Point4D(2 - Hue, 1, 0, 1); // G = 1, R = 1=>0
+            else if (Hue < 3) // [2, 3)
+                return new Point4D(0, 1, Hue - 2, 1); // G = 1, B = 0=>1
+            else if (Hue < 4) // [3, 4)
+                return new Point4D(0, 4 - Hue, 1, 1); // B = 1, G = 1=>0
+            else if (Hue < 5) // [4, 5)
+                return new Point4D(Hue - 4, 0, 1, 1); // B = 1, R = 0=>1
+            else // [5, 6)
+                return new Point4D(1, 0, 6 - Hue, 1); // R = 1, B = 1=>0
+        }
+
+        public Color HueToColor(double Hue)
+        {
+            Hue = Hue % 6;
+            if (Hue < 0) Hue += 6;
+            if (Hue < 1) // [0, 1)
+                return Color.FromArgb(255, 255, (byte)((Hue) * 255),     0); // R = 255, G = 0=>255
+            else if (Hue < 2) // [1, 2)
+                return Color.FromArgb(255, (byte)((2 - Hue) * 255), 255, 0); // G = 255, R = 255=>0
+            else if (Hue < 3) // [2, 3)
+                return Color.FromArgb(255, 0, 255, (byte)((Hue - 2) * 255)); // G = 255, B = 0=>255
+            else if (Hue < 4) // [3, 4)
+                return Color.FromArgb(255, 0, (byte)((4 - Hue) * 255), 255); // B = 255, G = 255=>0
+            else if (Hue < 5) // [4, 5)
+                return Color.FromArgb(255, (byte)((Hue - 4) * 255), 0, 255); // B = 255, R = 0=>255
+            else // [5, 6)
+                return Color.FromArgb(255, 255, 0, (byte)((6 - Hue) * 255)); // R = 255, B = 255=>0
+        }
+
+        public override void UpdateDarkness(byte Darkness)
+        {
         }
     }
 }
