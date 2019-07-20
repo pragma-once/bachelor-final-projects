@@ -833,7 +833,7 @@ namespace CustomControls
                 return new Point4D(1, 0, 6 - Hue, 1); // R = 1, B = 1=>0
         }
 
-        public Color HueToColor(double Hue)
+        public static Color HueToColor(double Hue)
         {
             Hue = Hue % 6;
             if (Hue < 0) Hue += 6;
