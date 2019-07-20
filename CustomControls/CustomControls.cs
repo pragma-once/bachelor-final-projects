@@ -728,7 +728,7 @@ namespace CustomControls
                 }
                 else
                 {
-                    H = pos.X * pos.Y;
+                    H = 0.5 + new_d / 2;
                     UpdateSizes();
                     TempSelectedHue = Hue;
                     UpdateHue();
