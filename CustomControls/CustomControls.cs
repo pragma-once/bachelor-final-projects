@@ -688,19 +688,18 @@ namespace CustomControls
                 pos.X -= 1;
                 pos.Y -= 1;
 
-                double new_d = Math.Sqrt(pos.X * pos.X + pos.Y * pos.Y);
+                double new_d = pos.X * pos.X + pos.Y * pos.Y;
                 if (new_d > 1)
                 {
                     if (d <= 1)
                         MouseLeave(null, null);
                     return;
                 }
-                d = new_d;
+                d = Math.Sqrt(new_d);
 
-                new_d *= new_d;
-                new_d *= new_d;
-                new_d *= new_d;
-                new_d *= new_d;
+                new_d *= new_d; // d ^ 4
+                new_d *= new_d; // d ^ 8
+                new_d *= new_d; // d ^ 16
 
                 new_d = 1 - new_d;
 
