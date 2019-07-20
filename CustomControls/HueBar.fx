@@ -1,5 +1,7 @@
 // Compile with: "C:\Program Files (x86)\Windows Kits\...\bin\...\x86\fxc.exe" /T ps_3_0 /E main /Fo HueBar.ps HueBar.fx
 
+#define MAGNIFIER 1
+
 static const float PI = 3.14159265f;
 
 sampler2D Input : register(s0);
@@ -44,9 +46,27 @@ float4 main(float2 uv : TEXCOORD) : COLOR
         s = s * s;
     }
 
-    float center_threshold = CenterSize - s * CursorSize / 4;
+    float s_effect = s * CursorSize;
+    float center_threshold = CenterSize - s_effect / 4;
 
     if (d < center_threshold) return float4(0, 0, 0, 0);
+
+#if MAGNIFIER
+    if (s > 0)
+    {
+        float CP = CursorPosition;
+        float a = abs(CP - Hue);
+        if (abs(CP + 6 - Hue) < a) CP += 6;
+        else if (abs(CP - 6 - Hue) < a) CP -= 6;
+        float temp = 1 - s_effect;
+        temp *= temp;
+        temp *= temp;
+        temp = 1 - temp;
+        Hue = lerp(Hue, CP, temp);
+        if (Hue > 6) Hue -= 6;
+        else if (Hue < 0) Hue += 6;
+    }
+#endif
 
     float4 color;
     if (Hue < 1) // [0, 1)
@@ -65,7 +85,7 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     n = (uv / d) * AA;
     nd = sqrt(n.x * n.x + n.y * n.y);
 
-    if (d > 1 - nd) return color * lerp(0, 1, (1 - d) / nd);
+    if (d > 1 - nd) return color * ((1 - d) / nd);
     if (d < center_threshold + nd + s)
     {
         if (CursorSize != 0 && s != 0)
@@ -74,9 +94,9 @@ float4 main(float2 uv : TEXCOORD) : COLOR
             s *= 2;
             s = 1 - s * s;
             s = 1 - s * s;
-            nd *= 1 + s * 0.2 * CursorSize;
+            nd *= 1 + s_effect * 0.2;
         }
-        if (d < center_threshold + nd) return color * lerp(0, 1, (d - center_threshold) / nd);
+        if (d < center_threshold + nd) return color * ((d - center_threshold) / nd);
     }
 
     return color;

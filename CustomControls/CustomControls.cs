@@ -664,7 +664,7 @@ namespace CustomControls
                     else if (Math.Abs((Hue - 6) - TempSelectedHue) < temp) Hue -= 6;
                     Animators.AnimateNatural(
                         SelectedHueToken,
-                        (double x) => { x = x % 6; if (x < 0) x += 6; TempSelectedHue = x; UpdateHue(); },
+                        (double x) => { if (x > 6) x -= 6; if (x < 0) x += 6; TempSelectedHue = x; UpdateHue(); },
                         GlobalSettings.AnimationSpeed,
                         TempSelectedHue,
                         Hue);
@@ -722,10 +722,10 @@ namespace CustomControls
                     else if (Math.Abs((Hue - 6) - TempSelectedHue) < temp) Hue -= 6;
                     Animators.Tail(
                         SelectedHueToken,
-                        (double x) => { x = x % 6; if (x < 0) x += 6; TempSelectedHue = x; UpdateHue(); },
+                        (double x) => { if (x > 6) x -= 6; if (x < 0) x += 6; TempSelectedHue = x; UpdateHue(); },
                         TempSelectedHue,
-                        Hue
-                        );
+                        Hue,
+                        8, 0.001);
                 }
                 else
                 {
