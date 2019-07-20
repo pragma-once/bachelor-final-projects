@@ -704,7 +704,7 @@ namespace CustomControls
 
                 new_d = 1 - new_d;
 
-                double Hue = Math.Acos(pos.Y / d) * (3 / Math.PI);
+                double Hue = d == 0 ? 0 : Math.Acos(pos.Y / d) * (3 / Math.PI);
                 if (pos.X < 0) Hue += 3;
                 else Hue = 3 - Hue;
 
