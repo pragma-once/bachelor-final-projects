@@ -680,6 +680,8 @@ namespace CustomControls
                 ClickPotential = false;
             };
 
+            OnHueSet = () => MouseLeave(null, null);
+
             MainGrid.MouseMove += (object sender, System.Windows.Input.MouseEventArgs e) =>
             {
                 Point pos = e.MouseDevice.GetPosition(MainGrid);
@@ -777,7 +779,10 @@ namespace CustomControls
         public double? SelectedHue
         {
             get { return selectedHue; }
+            set { selectedHue = value; OnHueSet(); }
         }
+
+        Action OnHueSet;
 
         public Action OnClick;
 
