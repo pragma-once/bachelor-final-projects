@@ -27,8 +27,8 @@ float4 main(float2 uv : TEXCOORD) : COLOR
         n = (uv / d) * AA;
         nd = sqrt(n.x * n.x + n.y * n.y);
         float4 color = CenterDotColor;
-        if (d > CenterDotSize - nd) color.a *= lerp(0, 1, (CenterDotSize - d) / nd);
-        color.a *= tex2D(Input, uv.xy).a;
+        if (d > CenterDotSize - nd) color *= lerp(0, 1, (CenterDotSize - d) / nd);
+        color *= tex2D(Input, uv.xy).a;
         return color;
     }
     if (CursorSize == 0 && d2 < CenterSize * CenterSize) return float4(0, 0, 0, 0);
@@ -87,7 +87,7 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     n = (uv / d) * AA;
     nd = sqrt(n.x * n.x + n.y * n.y);
 
-    if (d > 1 - nd) color.a *= ((1 - d) / nd);
+    if (d > 1 - nd) color *= ((1 - d) / nd);
     else if (d < center_threshold + nd + s)
     {
         if (CursorSize != 0 && s != 0)
@@ -98,9 +98,9 @@ float4 main(float2 uv : TEXCOORD) : COLOR
             s = 1 - s * s;
             nd *= 1 + s_effect * 0.2;
         }
-        if (d < center_threshold + nd) color.a *= ((d - center_threshold) / nd);
+        if (d < center_threshold + nd) color *= ((d - center_threshold) / nd);
     }
 
-    color.a *= tex2D(Input, uv.xy).a;
+    color *= tex2D(Input, uv.xy).a;
     return color;
 }
