@@ -632,8 +632,10 @@ namespace CustomControls
         {
             MainGrid.Focusable = true;
 
-            MainGrid.Effect = HueBar;
-            MainGrid.Background = new SolidColorBrush(Color.FromArgb(1, 1, 1, 1));
+            Grid EffectGrid = new Grid();
+            EffectGrid.Effect = HueBar;
+            EffectGrid.Background = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+            MainGrid.Children.Add(EffectGrid);
 
             MainGrid.SizeChanged += (object sender, System.Windows.SizeChangedEventArgs e) =>
             {
