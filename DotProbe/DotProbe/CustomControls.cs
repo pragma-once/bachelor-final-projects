@@ -361,9 +361,9 @@ namespace CustomControls
         SolidColorBrush BGBrush = new SolidColorBrush();
         SolidColorBrush FGBrush = new SolidColorBrush();
 
-        byte FGBrightness  = 0;
+        byte FGBrightness = 0;
         const byte MidBrightness = 127;
-        byte BGBrightness  = 255;
+        byte BGBrightness = 255;
         double ThumbPosition = 0; // [0, 1]
         double ThumbShrinkage = 1; // [0, 1]
 
@@ -441,7 +441,7 @@ namespace CustomControls
                         (double h) => { H = h; UpdateColors(); },
                         GlobalSettings.AnimationSpeed * 2,
                         H, 1);
-                else H = 1;
+                else { H = 1; UpdateColors(); }
             };
 
             MainGrid.MouseLeave += (object sender, System.Windows.Input.MouseEventArgs e) =>
@@ -463,6 +463,7 @@ namespace CustomControls
                 {
                     H = 0;
                     P = 0;
+                    UpdateColors();
                 }
                 ClickPotential = false;
             };
@@ -476,7 +477,7 @@ namespace CustomControls
                         (double p) => { P = p; UpdateColors(); },
                         GlobalSettings.AnimationSpeed * 4,
                         P, 1);
-                else P = 1;
+                else { P = 1; UpdateColors(); }
                 MainGrid.Focus();
             };
 
@@ -493,7 +494,7 @@ namespace CustomControls
                         (double p) => { P = p; UpdateColors(); },
                         PSpeed,
                         P, 0);
-                else P = 0;
+                else { P = 0; UpdateColors(); }
             };
         }
 
