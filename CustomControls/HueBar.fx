@@ -27,7 +27,7 @@ float4 main(float2 uv : TEXCOORD) : COLOR
         n = (uv / d) * AA;
         nd = sqrt(n.x * n.x + n.y * n.y);
         float4 color = CenterDotColor;
-        if (d > CenterDotSize - nd) color *= lerp(0, 1, (CenterDotSize - d) / nd);
+        if (d > CenterDotSize - nd) color *= ((CenterDotSize - d) / nd);
         color *= tex2D(Input, uv.xy).a;
         return color;
     }
