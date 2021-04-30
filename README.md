@@ -8,7 +8,9 @@ My final projects, 2 WPF psychological testing applications:
 
 ## ColorPicker
 
-This is the best custom control made for these projects. It uses a custom shader to render the whole control.
+This is the best custom control made for these projects.
+It uses a custom shader to render the whole control.
+The shader is not optimized at all, but is practical for this project.
 
 ### Demo
 
