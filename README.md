@@ -13,7 +13,7 @@ It uses a custom shader to render the whole control.
 The shader is **not optimized** at all, but is practical for this project.
 Please do not try to learn a lot from my shader.
 **Using if statements (branches) isn't a great practice** for shaders.
-Lookup: SIMD and if statements
+Lookup SIMD and if statements.
 
 ### Demo
 
